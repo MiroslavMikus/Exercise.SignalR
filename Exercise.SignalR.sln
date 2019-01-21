@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.271
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Exercise.SignalR", "Exercise.SignalR\Exercise.SignalR.csproj", "{772BD88F-28FB-4E2E-A94E-5CC44C4BC2D2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Exercise.SignalR.Server", "Exercise.SignalR.Server\Exercise.SignalR.Server.csproj", "{02851FE2-B73E-49AC-8F8D-9614AEEAAD62}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,10 +11,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{772BD88F-28FB-4E2E-A94E-5CC44C4BC2D2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{772BD88F-28FB-4E2E-A94E-5CC44C4BC2D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{772BD88F-28FB-4E2E-A94E-5CC44C4BC2D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{772BD88F-28FB-4E2E-A94E-5CC44C4BC2D2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{02851FE2-B73E-49AC-8F8D-9614AEEAAD62}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{02851FE2-B73E-49AC-8F8D-9614AEEAAD62}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{02851FE2-B73E-49AC-8F8D-9614AEEAAD62}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{02851FE2-B73E-49AC-8F8D-9614AEEAAD62}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
