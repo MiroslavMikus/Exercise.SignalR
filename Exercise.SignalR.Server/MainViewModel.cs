@@ -1,22 +1,27 @@
 ﻿using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
+using Microsoft.AspNet.SignalR;
 using Microsoft.Owin.Hosting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace Exercise.SignalR.Server
 {
-    public class MainViewModel : ViewModelBase
+    /// <summary>
+    /// IOC https://docs.microsoft.com/en-us/aspnet/signalr/overview/advanced/dependency-injection
+    /// </summary>
+    public partial class MainViewModel : ViewModelBase
     {
         const string SERVER_URI = "http://localhost:8080";
         public IDisposable SigmalRHost { get; set; }
 
         private bool _isRunning = false;
         public bool IsRunning { get => _isRunning; set => Set(ref _isRunning, value); }
+
+        private IHubContext _hubContext;
 
         public RelayCommand StartCommmand { get; }
 
@@ -39,6 +44,9 @@ namespace Exercise.SignalR.Server
 
         public MainViewModel()
         {
+
+            _hubContext = GlobalHost.ConnectionManager.GetHubContext<MessageHub>();
+
             StartCommmand = new RelayCommand(() =>
             {
                 SigmalRHost = WebApp.Start(SERVER_URI);
