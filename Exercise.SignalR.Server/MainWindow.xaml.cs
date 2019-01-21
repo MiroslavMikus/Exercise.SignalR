@@ -23,6 +23,7 @@ namespace Exercise.SignalR.Server
         public MainWindow()
         {
             InitializeComponent();
+            DataContext = new MainViewModel();
         }
     }
 }

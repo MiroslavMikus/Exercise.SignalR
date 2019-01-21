@@ -8,6 +8,9 @@
         Title="MainWindow" Height="450" Width="800"
         d:DataContext="{d:DesignInstance local:MainViewModel, IsDesignTimeCreatable=True}"
         >
+    <Window.Resources>
+        <local:InvertConverter x:Key="InverConvereter"/>
+    </Window.Resources>
     <Grid >
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="auto"/>
@@ -19,8 +22,10 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <Button Width="200" Content="Start" Margin="6" Command="{Binding StartCommmand}"/>
-        <Button Width="200" Content="Stop" Grid.Column="2" Margin="6" Command="{Binding StartCommmand}"/>
-        <TextBlock Grid.Row="1" Grid.ColumnSpan="3" Margin="6"/>
+        <Button Width="200" Content="Start" Margin="6" Command="{Binding StartCommmand}"
+                IsEnabled="{Binding IsRunning, Converter={StaticResource InverConvereter}}"/>
+        <Button Width="200" Content="Stop" Grid.Column="2" Margin="6" Command="{Binding StopCommand}"
+                IsEnabled="{Binding IsRunning}"/>
+        <TextBlock Grid.Row="1" Grid.ColumnSpan="3" Margin="6" Background="LightGray" Padding="10" Text="{Binding LogWindow}"/>
     </Grid>
 </Window>
