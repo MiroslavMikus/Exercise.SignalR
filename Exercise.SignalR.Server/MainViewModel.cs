@@ -13,7 +13,7 @@ namespace Exercise.SignalR.Server
     /// <summary>
     /// IOC https://docs.microsoft.com/en-us/aspnet/signalr/overview/advanced/dependency-injection
     /// </summary>
-    public partial class MainViewModel : ViewModelBase
+    public class MainViewModel : ViewModelBase
     {
         const string SERVER_URI = "http://localhost:8080";
         public IDisposable SigmalRHost { get; set; }
