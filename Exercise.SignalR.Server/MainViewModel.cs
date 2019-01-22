@@ -21,8 +21,6 @@ namespace Exercise.SignalR.Server
         private bool _isRunning = false;
         public bool IsRunning { get => _isRunning; set => Set(ref _isRunning, value); }
 
-        private IHubContext _hubContext;
-
         public RelayCommand StartCommmand { get; }
 
         public RelayCommand StopCommand { get; }
@@ -44,8 +42,7 @@ namespace Exercise.SignalR.Server
 
         public MainViewModel()
         {
-
-            _hubContext = GlobalHost.ConnectionManager.GetHubContext<MessageHub>();
+            App.Messager.Register<string>(this, a => LogWindow = a);
 
             StartCommmand = new RelayCommand(() =>
             {

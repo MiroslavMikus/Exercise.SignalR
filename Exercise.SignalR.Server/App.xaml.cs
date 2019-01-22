@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GalaSoft.MvvmLight.Messaging;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
@@ -13,5 +14,6 @@ namespace Exercise.SignalR.Server
     /// </summary>
     public partial class App : Application
     {
+        public static IMessenger Messager = new Messenger();
     }
 }

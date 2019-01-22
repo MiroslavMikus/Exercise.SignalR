@@ -9,8 +9,6 @@ namespace Exercise.SignalR.Server
     /// </summary>
     public class MessageHub : Hub
     {
-        event EventHandler<string> StateChanged;
-
         public void Send(string name, string message)
         {
             Clients.All.AddMessage(name, message);
@@ -18,13 +16,13 @@ namespace Exercise.SignalR.Server
 
         public override Task OnConnected()
         {
-            StateChanged?.Invoke(this, "Client connected: " + Context.ConnectionId);
+            App.Messager.Send<string>("Client connected: " + Context.ConnectionId);
 
             return base.OnConnected();
         }
         public override Task OnDisconnected(bool stopCalled)
         {
-            StateChanged?.Invoke(this, "Client disconnected: " + Context.ConnectionId);
+            App.Messager.Send<string>("Client disconnected: " + Context.ConnectionId);
 
             return base.OnDisconnected(stopCalled);
         }
