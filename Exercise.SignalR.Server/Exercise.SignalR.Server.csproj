@@ -99,6 +99,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="MahApps.Metro">
+      <Version>1.6.5</Version>
+    </PackageReference>
     <PackageReference Include="Microsoft.AspNet.SignalR.Core">
       <Version>2.4.0</Version>
     </PackageReference>
