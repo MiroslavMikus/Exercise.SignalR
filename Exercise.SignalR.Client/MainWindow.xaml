@@ -11,6 +11,8 @@
     <Window.Resources>
         <local:BoolToVisibilityConverter x:Key="VisConverter"/>
         <local:InvertConverter x:Key="Invert"/>
+        <local:NotEmptyString x:Key="NotEmpty"/>
+        <local:MultiBoolConverter x:Key="MultiAnd"/>
     </Window.Resources>
 
     <Grid >
@@ -26,18 +28,30 @@
             <RowDefinition Height="88*"/>
         </Grid.RowDefinitions>
 
-        <TextBox Margin="6" Text="{Binding Input}"/>
+        <TextBox x:Name="InputField" Margin="6" Text="{Binding Input}"/>
 
         <Button Width="100" Content="Sign out" Grid.Column="3" Margin="6" 
                 Command="{Binding SignOutCommand}"
                 IsEnabled="{Binding IsConnected}" />
         <Button Width="100" Content="SignIn" Grid.Column="2" Margin="6" 
-                Command="{Binding SignInCommand}"
-                IsEnabled="{Binding IsConnected, Converter={StaticResource Invert}}" />
+                Command="{Binding SignInCommand}">
+            <Button.IsEnabled>
+                <MultiBinding Converter="{StaticResource MultiAnd}">
+                    <Binding ElementName="InputField" Path="Text" Converter="{StaticResource NotEmpty}"/>
+                    <Binding Path="DataContext.IsConnected" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Window}" Converter="{StaticResource Invert}"/>
+                </MultiBinding>
+            </Button.IsEnabled>
+        </Button>
         <Button Width="100" Content="Send" Grid.Column="1" Margin="6" 
                 Command="{Binding SendCommand}"
-                IsEnabled="{Binding IsConnected}" 
-                />
+               >
+            <Button.IsEnabled>
+                <MultiBinding Converter="{StaticResource MultiAnd}">
+                    <Binding ElementName="InputField" Path="Text" Converter="{StaticResource NotEmpty}"/>
+                    <Binding Path="DataContext.IsConnected" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Window}"/>
+                </MultiBinding>
+            </Button.IsEnabled>
+        </Button>
         <ScrollViewer Grid.Row="1" Grid.ColumnSpan="2" Grid.RowSpan="2" VerticalScrollBarVisibility="Auto">
             <TextBlock  Margin="6" Background="LightGray" Padding="10" Text="{Binding LogWindow}" />
         </ScrollViewer>

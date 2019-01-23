@@ -60,6 +60,8 @@ namespace Exercise.SignalR.Client
 
                 Connection.Stop();
 
+                Connection.Dispose();
+
                 IsConnected = false;
             });
 
@@ -92,13 +94,14 @@ namespace Exercise.SignalR.Client
                     await Connection.Start();
 
                     await HubProxy.Invoke("SignIn", _name);
+
+                    IsConnected = true;
                 }
                 catch (Exception)
                 {
                     LogWindow = $"Cant connect to {SERVER_URI}";
                 }
 
-                IsConnected = true;
             });
 
             SendCommand = new RelayCommand(() =>
