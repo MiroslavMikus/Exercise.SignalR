@@ -22,6 +22,7 @@ namespace Exercise.SignalR.Client
         private string _input;
         public string Input { get => _input; set => Set(ref _input, value); }
         public ICommand SignInCommand { get; set; }
+        public ICommand CloseCommand { get; set; }
         public ICommand SendCommand { get; set; }
 
         private StringBuilder _logWindow = new StringBuilder();
@@ -41,13 +42,25 @@ namespace Exercise.SignalR.Client
 
         public MainWindowViewModel()
         {
+            CloseCommand = new RelayCommand(() =>
+            {
+                Connection.Stop();
+
+                IsConnected = false;
+            });
+
             SignInCommand = new RelayCommand<string>(async a =>
             {
                 Connection = new HubConnection(SERVER_URI);
+
                 Connection.Closed += Connection_Closed;
+                Connection.Reconnecting += Connection_Reconnecting;
+                Connection.StateChanged += Connection_StateChanged;
+
                 HubProxy = Connection.CreateHubProxy("MessageHub");
 
                 _name = Input;
+
                 Input = string.Empty;
 
                 HubProxy.On<string, string>("addMessage", (name, message) =>
@@ -55,7 +68,14 @@ namespace Exercise.SignalR.Client
                     LogWindow = $"{name}: {message}";
                 });
 
-                await Connection.Start();
+                try
+                {
+                    await Connection.Start();
+                }
+                catch (Exception)
+                {
+                    LogWindow = $"Cant connect to {SERVER_URI}";
+                }
 
                 IsConnected = true;
             });
@@ -65,6 +85,16 @@ namespace Exercise.SignalR.Client
                 HubProxy.Invoke("send", _name, Input);
                 Input = string.Empty;
             });
+        }
+
+        private void Connection_StateChanged(StateChange state)
+        {
+            LogWindow = $"State changed from {state.OldState} to {state.NewState}";
+        }
+
+        private void Connection_Reconnecting()
+        {
+            LogWindow = "Trying to reconnect";
         }
 
         private void Connection_Closed()

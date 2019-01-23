@@ -26,5 +26,9 @@ namespace Exercise.SignalR.Server
 
             return base.OnDisconnected(stopCalled);
         }
+        public override async Task OnReconnected()
+        {
+            await base.OnReconnected();    
+        }
     }
 }
