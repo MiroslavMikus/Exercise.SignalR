@@ -16,12 +16,16 @@ namespace Exercise.SignalR.Server
         {
             Users.Add(name);
 
+            App.Messager.Send<string>($"User {name} connected");
+
             Clients.All.OnUserChanged(Users);
         }
 
         public void SignOut(string name)
         {
             Users.Remove(name);
+
+            App.Messager.Send<string>($"User {name} disconnected");
 
             Clients.All.OnUserChanged(Users);
         }
