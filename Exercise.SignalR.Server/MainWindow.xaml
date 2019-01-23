@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:Exercise.SignalR.Server"
         xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800"
+        Title="SignalR Server" Height="450" Width="800"
         d:DataContext="{d:DesignInstance local:MainViewModel, IsDesignTimeCreatable=True}"
         >
     <Window.Resources>
@@ -27,6 +27,9 @@
                 IsEnabled="{Binding IsRunning, Converter={StaticResource InverConvereter}}"/>
         <Button Width="200" Content="Stop" Grid.Column="2" Margin="6" Command="{Binding StopCommand}"
                 IsEnabled="{Binding IsRunning}"/>
-        <TextBlock Grid.Row="1" Grid.ColumnSpan="3" Margin="6" Background="LightGray" Padding="10" Text="{Binding LogWindow}"/>
+        
+        <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.Row="1" Grid.ColumnSpan="3" >
+            <TextBlock Margin="6" Background="LightGray" Padding="10" Text="{Binding LogWindow}"/>
+        </ScrollViewer>
     </Grid>
 </Controls:MetroWindow>

@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:Exercise.SignalR.Client"
         mc:Ignorable="d"
         xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
-        Title="MainWindow" Height="450" Width="800"
+        Title="SignalR Client" Height="450" Width="800"
         d:DataContext="{d:DesignInstance local:MainWindowViewModel, IsDesignTimeCreatable=True}">
     <Window.Resources>
         <local:BoolToVisibilityConverter x:Key="VisConverter"/>
