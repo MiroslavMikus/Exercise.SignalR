@@ -10,28 +10,45 @@
         d:DataContext="{d:DesignInstance local:MainWindowViewModel, IsDesignTimeCreatable=True}">
     <Window.Resources>
         <local:BoolToVisibilityConverter x:Key="VisConverter"/>
+        <local:InvertConverter x:Key="Invert"/>
     </Window.Resources>
 
     <Grid >
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="533*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="auto"/>
             <ColumnDefinition Width="auto"/>
             <ColumnDefinition Width="auto"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="7*"/>
+            <RowDefinition Height="88*"/>
         </Grid.RowDefinitions>
 
         <TextBox Margin="6" Text="{Binding Input}"/>
 
-        <Button Width="200" Content="Disconnect" Grid.Column="2" Margin="5,6,7,6" 
-                Command="{Binding CloseCommand}"/>
-        <Button Width="200" Content="SignIn" Grid.Column="1" Margin="5,6,7,6" 
-                Command="{Binding SignInCommand}"/>
-        <Button Width="200" Content="Send" Grid.Column="2" Margin="6" 
+        <Button Width="100" Content="Sign out" Grid.Column="3" Margin="6" 
+                Command="{Binding SignOutCommand}"
+                IsEnabled="{Binding IsConnected}" />
+        <Button Width="100" Content="SignIn" Grid.Column="2" Margin="6" 
+                Command="{Binding SignInCommand}"
+                IsEnabled="{Binding IsConnected, Converter={StaticResource Invert}}" />
+        <Button Width="100" Content="Send" Grid.Column="1" Margin="6" 
                 Command="{Binding SendCommand}"
-                Visibility="{Binding IsConnected, Converter={StaticResource VisConverter}}"/>
-        <TextBlock Grid.Row="1" Grid.ColumnSpan="3" Margin="6" Background="LightGray" Padding="10" Text="{Binding LogWindow}"/>
+                IsEnabled="{Binding IsConnected}" 
+                />
+        <ScrollViewer Grid.Row="1" Grid.ColumnSpan="2" Grid.RowSpan="2" VerticalScrollBarVisibility="Auto">
+            <TextBlock  Margin="6" Background="LightGray" Padding="10" Text="{Binding LogWindow}" />
+        </ScrollViewer>
+        
+        <Label Content="Online users:" Grid.Column="2" Grid.Row="1"/>
+        <ItemsControl Grid.Column="2" Grid.Row="2" Grid.ColumnSpan="2" Margin="6" Background="LightBlue" Padding="10" ItemsSource="{Binding Users}" >
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Label Content="{Binding}"/>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
     </Grid>
 </Controls:MetroWindow>

@@ -3,6 +3,7 @@ using GalaSoft.MvvmLight.Command;
 using Microsoft.AspNet.SignalR.Client;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,8 +22,17 @@ namespace Exercise.SignalR.Client
         public bool IsConnected { get => _isConnected; set => Set(ref _isConnected, value); }
         private string _input;
         public string Input { get => _input; set => Set(ref _input, value); }
+
+
+        private ObservableCollection<string> _users;
+        public ObservableCollection<string> Users
+        {
+            get { return _users; }
+            set { Set(ref _users, value); }
+        }
+
         public ICommand SignInCommand { get; set; }
-        public ICommand CloseCommand { get; set; }
+        public ICommand SignOutCommand { get; set; }
         public ICommand SendCommand { get; set; }
 
         private StringBuilder _logWindow = new StringBuilder();
@@ -42,8 +52,12 @@ namespace Exercise.SignalR.Client
 
         public MainWindowViewModel()
         {
-            CloseCommand = new RelayCommand(() =>
+            SignOutCommand = new RelayCommand(() =>
             {
+                HubProxy.Invoke("SignOut", _name);
+
+                Users.Clear();
+
                 Connection.Stop();
 
                 IsConnected = false;
@@ -68,9 +82,16 @@ namespace Exercise.SignalR.Client
                     LogWindow = $"{name}: {message}";
                 });
 
+                HubProxy.On<List<string>>("OnUserChanged", names =>
+                {
+                    Users = new ObservableCollection<string>(names);
+                });
+
                 try
                 {
                     await Connection.Start();
+
+                    await HubProxy.Invoke("SignIn", _name);
                 }
                 catch (Exception)
                 {
