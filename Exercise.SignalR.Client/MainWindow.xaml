@@ -80,12 +80,14 @@
                     </ItemsControl.ItemTemplate>
                 </ListBox>
                 <StackPanel Grid.Row="2" Orientation="Horizontal">
-                    <Button Content="Add" Margin="3" Command="{Binding AddCommand}"/>
+                    <Button Content="Add" Margin="3" Command="{Binding AddCommand}" ToolTip="Create a new chat room"/>
                     <Button Content="Join" Margin="3" 
+                            ToolTip="Join selected char room"
                             Command="{Binding JoinCommand}" 
                             CommandParameter="{Binding ElementName=RoomsList, Path=SelectedItem.Name}"
                             IsEnabled="{Binding ElementName=RoomsList, Path=SelectedItem.IsActive, Converter={StaticResource Invert}}"/>
                     <Button Content="Leave" Margin="3" 
+                            ToolTip="Leave selected chat room"
                             Command="{Binding LeaveCommand}"
                             CommandParameter="{Binding ElementName=RoomsList, Path=SelectedItem}"
                             IsEnabled="{Binding ElementName=RoomsList, Path=SelectedItem.IsActive}"/>

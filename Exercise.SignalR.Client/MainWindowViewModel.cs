@@ -142,7 +142,7 @@ namespace Exercise.SignalR.Client
                 {
                     if (Rooms.Any(a => a.Name == input))
                     {
-                        await (App.Current.MainWindow as MetroWindow).ShowMessageAsync("Error", $"Specified room: {input} already exist!");
+                        await (App.Current.MainWindow as MetroWindow).ShowMessageAsync("Error", $"Specified room: '{input}' already exist!");
                     }
                     else
                     {
@@ -168,7 +168,7 @@ namespace Exercise.SignalR.Client
                 {
                     var chatRoom = EnsureRoom(room);
                     chatRoom.Users.Add(user);
-                    chatRoom.Chat = $"User: {user} joined chat room.";
+                    chatRoom.Chat = $"User: '{user}' joined chat room.";
 
                     if (user == _name)
                         chatRoom.IsActive = true;
@@ -181,7 +181,7 @@ namespace Exercise.SignalR.Client
                 {
                     var chatRoom = EnsureRoom(room);
                     chatRoom.Users.Remove(user);
-                    chatRoom.Chat = $"User: {user} leaved chat room.";
+                    chatRoom.Chat = $"User: '{user}' leaved chat room.";
 
                     if (user == _name)
                         chatRoom.IsActive = false;

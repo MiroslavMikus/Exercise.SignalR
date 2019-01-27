@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNet.SignalR;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -16,7 +15,7 @@ namespace Exercise.SignalR.Server
         // Room name - Connection ID's
         private static readonly Dictionary<string, HashSet<string>> Rooms = new Dictionary<string, HashSet<string>>();
 
-        public async Task<Dictionary<string, List<string>>> SignIn(string name)
+        public Dictionary<string, List<string>> SignIn(string name)
         {
             Users[Context.ConnectionId] = name;
 
