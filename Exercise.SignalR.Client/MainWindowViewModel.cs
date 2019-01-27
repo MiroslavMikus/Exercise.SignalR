@@ -23,8 +23,8 @@ namespace Exercise.SignalR.Client
         private string _input;
         public string Input { get => _input; set => Set(ref _input, value); }
 
-        private ObservableCollection<Room> _rooms;
-        public ObservableCollection<Room> Rooms
+        private ObservableCollection<RoomViewModel> _rooms;
+        public ObservableCollection<RoomViewModel> Rooms
         {
             get { return _rooms; }
             set { Set(ref _rooms, value); }
@@ -74,10 +74,20 @@ namespace Exercise.SignalR.Client
 
                 Input = string.Empty;
 
-                HubProxy.On<string, string>("addMessage", (name, message) =>
+                HubProxy.On<string, string, string>("addMessage", (name, room, message) =>
                 {
-                    LogWindow = $"{name}: {message}";
+                    if (!Rooms.Any(b => b.Name == room))
+                    {
+                        Rooms.Add(new RoomViewModel()
+                        {
+                            Name = room
+                        });
+
+                        Rooms.Single(b => b.Name == room).Chat = message;
+                    }
                 });
+
+                HubProxy.On<>
 
                 try
                 {
