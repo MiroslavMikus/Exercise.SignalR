@@ -16,13 +16,18 @@ namespace Exercise.SignalR.Client
 {
     public class MainWindowViewModel : ViewModelBase
     {
-        public IHubProxy HubProxy { get; set; }
-        const string SERVER_URI = "http://localhost:8080/signalr";
+        private const string SERVER_POSTGFIX = "signalr";
+        private const string BASE_TITLE = "SignalR Client";
+
+        private IHubProxy _hubProxy { get; set; }
+        public string ServerUrl { get; set; } = "http://localhost:8080/";
         private readonly IDialogCoordinator _dialogCoordinator;
 
         public HubConnection Connection { get; set; }
 
+        public string Title { get; set; } = BASE_TITLE;
         private string _name;
+
         private bool _isConnected = false;
         public bool IsConnected { get => _isConnected; set => Set(ref _isConnected, value); }
         private string _input;
@@ -75,29 +80,40 @@ namespace Exercise.SignalR.Client
                 Connection.Dispose();
 
                 IsConnected = false;
+
+                Title = BASE_TITLE;
             });
 
             SignInCommand = new RelayCommand<string>(async a =>
             {
-                Connection = new HubConnection(SERVER_URI);
+                var urlBuilder = new UriBuilder(ServerUrl)
+                {
+                    Path = SERVER_POSTGFIX
+                };
+
+                Connection = new HubConnection(urlBuilder.ToString());
 
                 Connection.Closed += Connection_Closed;
                 Connection.Reconnecting += Connection_Reconnecting;
                 Connection.StateChanged += Connection_StateChanged;
 
-                HubProxy = Connection.CreateHubProxy("MessageHub");
+                _hubProxy = Connection.CreateHubProxy("MessageHub");
 
                 _name = Input;
 
+                Title = $"{BASE_TITLE} [{_name}]";
+
+                RaisePropertyChanged(nameof(Title));
+
                 Input = string.Empty;
 
-                SetupProxy(HubProxy);
+                SetupProxy(_hubProxy);
 
                 try
                 {
                     await Connection.Start();
 
-                    var rooms = await HubProxy.Invoke<Dictionary<string, List<string>>>("SignIn", _name);
+                    var rooms = await _hubProxy.Invoke<Dictionary<string, List<string>>>("SignIn", _name);
 
                     foreach (var room in rooms)
                     {
@@ -106,29 +122,29 @@ namespace Exercise.SignalR.Client
 
                     IsConnected = true;
 
-                    await HubProxy.Invoke("joinRoom", "Main Group");
+                    await _hubProxy.Invoke("joinRoom", "Main Group");
                 }
                 catch (Exception ex)
                 {
-                    LogWindow = $"Cant connect to {SERVER_URI}";
+                    LogWindow = $"Cant connect to {ServerUrl + SERVER_POSTGFIX}";
                 }
 
             });
 
             SendCommand = new RelayCommand<string>(a =>
             {
-                HubProxy.Invoke("send", _name, a, Input);
+                _hubProxy.Invoke("send", _name, a, Input);
                 Input = string.Empty;
             });
 
             LeaveCommand = new RelayCommand<RoomViewModel>(a =>
             {
-                HubProxy.Invoke("leaveRoom", a.Name);
+                _hubProxy.Invoke("leaveRoom", a.Name);
             });
 
             JoinCommand = new RelayCommand<string>(a =>
             {
-                HubProxy.Invoke("joinRoom", a);
+                _hubProxy.Invoke("joinRoom", a);
             });
 
             AddCommand = new RelayCommand(async () =>

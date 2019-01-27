@@ -8,8 +8,8 @@
         xmlns:Dialog="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
         mc:Ignorable="d"
         xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
-        Title="SignalR Client" Height="450" Width="800"
-        d:DataContext="{d:DesignInstance local:MainWindowViewModel, IsDesignTimeCreatable=True}">
+        Title="{Binding Title}" Height="450" Width="800"
+        d:DataContext="{d:DesignInstance local:MainWindowViewModel, IsDesignTimeCreatable=False}">
     <Window.Resources>
         <local:BoolToVisibilityConverter x:Key="VisConverter"/>
         <local:InvertConverter x:Key="Invert"/>
@@ -17,6 +17,30 @@
         <local:NotNull x:Key="NotNull"/>
         <local:MultiBoolConverter x:Key="MultiAnd"/>
     </Window.Resources>
+    <Controls:MetroWindow.RightWindowCommands>
+        <Controls:WindowCommands>
+            <Button Content="Settings" Click="Settings_Click"/>
+        </Controls:WindowCommands>
+    </Controls:MetroWindow.RightWindowCommands>
+    <Controls:MetroWindow.Flyouts>
+        <Controls:FlyoutsControl >
+            <Controls:Flyout x:Name="Settings"
+                             AnimateOpacity="True"
+                             CloseButtonIsCancel="True"
+                             Header="Settings"
+                             HorizontalContentAlignment="Stretch"
+                             Position="Right"
+                             >
+                <DockPanel>
+                    <Label Content="Enter server address:" Margin="5" FontSize="15" DockPanel.Dock="Top"/>
+                    <TextBox Margin="10" DockPanel.Dock="Top" Text="{Binding ServerUrl, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, Delay=500}"/>
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <TextBlock  Margin="6" Background="LightGray" Padding="10" Text="{Binding LogWindow}" Foreground="Black"/>
+                    </ScrollViewer>
+                </DockPanel>
+            </Controls:Flyout>
+        </Controls:FlyoutsControl>
+    </Controls:MetroWindow.Flyouts>
 
     <Grid >
         <Grid.ColumnDefinitions>
@@ -82,17 +106,30 @@
                     </ItemsControl.ItemTemplate>
                 </ListBox>
                 <StackPanel Grid.Row="2" Orientation="Horizontal">
-                    <Button Content="Add" Margin="3" Command="{Binding AddCommand}" ToolTip="Create a new chat room"/>
+                    <Button Content="Add" Margin="3" Command="{Binding AddCommand}" ToolTip="Create a new chat room" IsEnabled="{Binding IsConnected}"/>
                     <Button Content="Join" Margin="3" 
                             ToolTip="Join selected char room"
                             Command="{Binding JoinCommand}" 
-                            CommandParameter="{Binding ElementName=RoomsList, Path=SelectedItem.Name}"
-                            IsEnabled="{Binding ElementName=RoomsList, Path=SelectedItem.IsActive, Converter={StaticResource Invert}}"/>
+                            CommandParameter="{Binding ElementName=RoomsList, Path=SelectedItem.Name}">
+                        <Button.IsEnabled>
+                            <MultiBinding Converter="{StaticResource MultiAnd}">
+                                <Binding ElementName="RoomsList" Path="SelectedItem.IsActive" Converter="{StaticResource Invert}"/>
+                                <Binding ElementName="RoomsList" Path="SelectedItem" Converter="{StaticResource NotNull}"/>
+                            </MultiBinding>
+                        </Button.IsEnabled>
+                    </Button>
                     <Button Content="Leave" Margin="3" 
                             ToolTip="Leave selected chat room"
                             Command="{Binding LeaveCommand}"
                             CommandParameter="{Binding ElementName=RoomsList, Path=SelectedItem}"
-                            IsEnabled="{Binding ElementName=RoomsList, Path=SelectedItem.IsActive}"/>
+                            >
+                        <Button.IsEnabled>
+                            <MultiBinding Converter="{StaticResource MultiAnd}">
+                                <Binding ElementName="RoomsList" Path="SelectedItem.IsActive"/>
+                                <Binding ElementName="RoomsList" Path="SelectedItem" Converter="{StaticResource NotNull}"/>
+                            </MultiBinding>
+                        </Button.IsEnabled>
+                    </Button>
                 </StackPanel>
             </Grid>
             <StackPanel DockPanel.Dock="Left">

@@ -27,5 +27,10 @@ namespace Exercise.SignalR.Client
             InitializeComponent();
             DataContext = new MainWindowViewModel(DialogCoordinator.Instance);
         }
+
+        private void Settings_Click(object sender, RoutedEventArgs e)
+        {
+            Settings.IsOpen = true;
+        }
     }
 }
