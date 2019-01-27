@@ -1,6 +1,8 @@
 ﻿using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Threading;
+using MahApps.Metro.Controls;
+using MahApps.Metro.Controls.Dialogs;
 using Microsoft.AspNet.SignalR.Client;
 using System;
 using System.Collections.Generic;
@@ -34,6 +36,9 @@ namespace Exercise.SignalR.Client
         public ICommand SignInCommand { get; set; }
         public ICommand SignOutCommand { get; set; }
         public ICommand SendCommand { get; set; }
+        public ICommand JoinCommand { get; set; }
+        public ICommand AddCommand { get; set; }
+        public ICommand LeaveCommand { get; set; }
 
         private StringBuilder _logWindow = new StringBuilder();
 
@@ -54,6 +59,13 @@ namespace Exercise.SignalR.Client
         {
             SignOutCommand = new RelayCommand(() =>
             {
+                foreach (var room in Rooms)
+                {
+                    room.Users.Clear();
+                }
+
+                Rooms.Clear();
+
                 Connection.Stop();
 
                 Connection.Dispose();
@@ -99,10 +111,44 @@ namespace Exercise.SignalR.Client
 
             });
 
-            SendCommand = new RelayCommand(() =>
+            SendCommand = new RelayCommand<string>(a =>
             {
-                HubProxy.Invoke("send", _name, Input);
+                HubProxy.Invoke("send", _name, a, Input);
                 Input = string.Empty;
+            });
+
+            LeaveCommand = new RelayCommand<RoomViewModel>(a =>
+            {
+                HubProxy.Invoke("leaveRoom", a.Name);
+            });
+
+            JoinCommand = new RelayCommand<string>(a =>
+            {
+                HubProxy.Invoke("joinRoom", a);
+            });
+
+            AddCommand = new RelayCommand(async () =>
+            {
+                var mySettings = new MetroDialogSettings()
+                {
+                    DefaultButtonFocus = MessageDialogResult.Affirmative,
+                    AffirmativeButtonText = "Create",
+                    NegativeButtonText = "Cancel"
+                };
+
+                var input = await (App.Current.MainWindow as MetroWindow).ShowInputAsync("Create a new chatroom", "Enter room name:", mySettings);
+
+                if (!string.IsNullOrEmpty(input))
+                {
+                    if (Rooms.Any(a => a.Name == input))
+                    {
+                        await (App.Current.MainWindow as MetroWindow).ShowMessageAsync("Error", $"Specified room: {input} already exist!");
+                    }
+                    else
+                    {
+                        JoinCommand.Execute(input);
+                    }
+                }
             });
         }
 
@@ -112,7 +158,7 @@ namespace Exercise.SignalR.Client
             {
                 DispatcherHelper.CheckBeginInvokeOnUI(() =>
                 {
-                    EnsureRoom(room).Chat = message;
+                    EnsureRoom(room).Chat = $"{name}: {message}";
                 });
             }));
 
@@ -120,7 +166,12 @@ namespace Exercise.SignalR.Client
             {
                 DispatcherHelper.CheckBeginInvokeOnUI(() =>
                 {
-                    EnsureRoom(room).Users.Add(user);
+                    var chatRoom = EnsureRoom(room);
+                    chatRoom.Users.Add(user);
+                    chatRoom.Chat = $"User: {user} joined chat room.";
+
+                    if (user == _name)
+                        chatRoom.IsActive = true;
                 });
             });
 
@@ -128,7 +179,17 @@ namespace Exercise.SignalR.Client
             {
                 DispatcherHelper.CheckBeginInvokeOnUI(() =>
                 {
-                    EnsureRoom(room).Users.Remove(user);
+                    var chatRoom = EnsureRoom(room);
+                    chatRoom.Users.Remove(user);
+                    chatRoom.Chat = $"User: {user} leaved chat room.";
+
+                    if (user == _name)
+                        chatRoom.IsActive = false;
+
+                    if (chatRoom.Users.Count == 0)
+                    {
+                        Rooms.Remove(chatRoom);
+                    }
                 });
             });
         }

@@ -12,6 +12,7 @@
         <local:BoolToVisibilityConverter x:Key="VisConverter"/>
         <local:InvertConverter x:Key="Invert"/>
         <local:NotEmptyString x:Key="NotEmpty"/>
+        <local:NotNull x:Key="NotNull"/>
         <local:MultiBoolConverter x:Key="MultiAnd"/>
     </Window.Resources>
 
@@ -43,25 +44,53 @@
         </Button>
         <Button Width="100" Content="Send" Grid.Column="1" Margin="6" 
                 Command="{Binding SendCommand}"
+                CommandParameter="{Binding ElementName=RoomsList, Path=SelectedItem.Name}"
                >
             <Button.IsEnabled>
                 <MultiBinding Converter="{StaticResource MultiAnd}">
                     <Binding ElementName="InputField" Path="Text" Converter="{StaticResource NotEmpty}"/>
+                    <Binding ElementName="RoomsList" Path="SelectedItem" Converter="{StaticResource NotNull}"/>
                     <Binding Path="DataContext.IsConnected" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Window}"/>
                 </MultiBinding>
             </Button.IsEnabled>
         </Button>
         <DockPanel Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="4">
-            <StackPanel DockPanel.Dock="Left">
-                <Label Content="Rooms:" Grid.Column="2" Grid.Row="1"/>
-                <ListBox Margin="6" ItemsSource="{Binding Rooms}" Width="150" x:Name="RoomsList">
+            <Grid DockPanel.Dock="Left">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="auto"/>
+                </Grid.RowDefinitions>
+                <Label Content="Rooms:" />
+                <ListBox Margin="6" ItemsSource="{Binding Rooms}" x:Name="RoomsList" Grid.Row="1">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Label Content="{Binding Name}"/>
+                            <Label Content="{Binding Name}">
+                                <Label.Style>
+                                    <Style TargetType="Label" BasedOn="{StaticResource {x:Type Label}}">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsActive}" Value="True">
+                                                <Setter Property="FontWeight" Value="Bold"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Label.Style>
+                            </Label>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ListBox>
-            </StackPanel>
+                <StackPanel Grid.Row="2" Orientation="Horizontal">
+                    <Button Content="Add" Margin="3" Command="{Binding AddCommand}"/>
+                    <Button Content="Join" Margin="3" 
+                            Command="{Binding JoinCommand}" 
+                            CommandParameter="{Binding ElementName=RoomsList, Path=SelectedItem.Name}"
+                            IsEnabled="{Binding ElementName=RoomsList, Path=SelectedItem.IsActive, Converter={StaticResource Invert}}"/>
+                    <Button Content="Leave" Margin="3" 
+                            Command="{Binding LeaveCommand}"
+                            CommandParameter="{Binding ElementName=RoomsList, Path=SelectedItem}"
+                            IsEnabled="{Binding ElementName=RoomsList, Path=SelectedItem.IsActive}"/>
+                </StackPanel>
+            </Grid>
             <StackPanel DockPanel.Dock="Left">
                 <Label Content="Users:" Grid.Column="2" Grid.Row="1"/>
                 <ListBox Margin="6" ItemsSource="{Binding ElementName=RoomsList, Path=SelectedItem.Users}" Width="100">
