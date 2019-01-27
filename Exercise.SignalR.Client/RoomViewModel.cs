@@ -8,7 +8,8 @@ namespace Exercise.SignalR.Client
 {
     public class RoomViewModel : ObservableObject, IEquatable<RoomViewModel>
     {
-        public ObservableCollection<string> Users { get; set; } = new ObservableCollection<string>();
+        private ObservableCollection<string> _users = new ObservableCollection<string>();
+        public ObservableCollection<string> Users { get => _users; set => Set(ref _users, value); }
         public string Name { get; set; }
         private StringBuilder _logWindow = new StringBuilder();
 

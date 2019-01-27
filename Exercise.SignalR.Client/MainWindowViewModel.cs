@@ -1,5 +1,6 @@
 ﻿using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
+using GalaSoft.MvvmLight.Threading;
 using Microsoft.AspNet.SignalR.Client;
 using System;
 using System.Collections.Generic;
@@ -84,16 +85,14 @@ namespace Exercise.SignalR.Client
 
                     foreach (var room in rooms)
                     {
-                        Rooms.Add(new RoomViewModel
-                        {
-                            Name = room.Key,
-                            Users = new ObservableCollection<string>(room.Value)
-                        });
+                        EnsureRoom(room.Key).Users = new ObservableCollection<string>(room.Value);
                     }
 
                     IsConnected = true;
+
+                    await HubProxy.Invoke("joinRoom", "Main Group");
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
                     LogWindow = $"Cant connect to {SERVER_URI}";
                 }
@@ -111,17 +110,26 @@ namespace Exercise.SignalR.Client
         {
             proxy.On("addMessage", (Action<string, string, string>)((name, room, message) =>
             {
-                EnsureRoom(room).Chat = message;
+                DispatcherHelper.CheckBeginInvokeOnUI(() =>
+                {
+                    EnsureRoom(room).Chat = message;
+                });
             }));
 
-            proxy.On<string, string>("userJoinRoom", (room, user) =>
+            proxy.On<string, string>("UserJoinRoom", (room, user) =>
             {
-                EnsureRoom(room).Users.Add(user);
+                DispatcherHelper.CheckBeginInvokeOnUI(() =>
+                {
+                    EnsureRoom(room).Users.Add(user);
+                });
             });
 
-            proxy.On<string, string>("userLeaveRoom", (room, user) =>
+            proxy.On<string, string>("UserLeaveRoom", (room, user) =>
             {
-                EnsureRoom(room).Users.Remove(user);
+                DispatcherHelper.CheckBeginInvokeOnUI(() =>
+                {
+                    EnsureRoom(room).Users.Remove(user);
+                });
             });
         }
 
@@ -135,7 +143,7 @@ namespace Exercise.SignalR.Client
                 });
             }
 
-            return Rooms.Single(b => b.Name == room);
+            return Rooms.Single(b => b.Name.Equals(room));
         }
 
         private void Connection_StateChanged(StateChange state)

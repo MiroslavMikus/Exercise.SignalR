@@ -24,8 +24,7 @@
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
-            <RowDefinition Height="7*"/>
-            <RowDefinition Height="88*"/>
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
         <TextBox x:Name="InputField" Margin="6" Text="{Binding Input}"/>
@@ -52,17 +51,30 @@
                 </MultiBinding>
             </Button.IsEnabled>
         </Button>
-        <ScrollViewer Grid.Row="1" Grid.ColumnSpan="2" Grid.RowSpan="2" VerticalScrollBarVisibility="Auto">
-            <TextBlock  Margin="6" Background="LightGray" Padding="10" Text="{Binding LogWindow}" />
-        </ScrollViewer>
-        
-        <Label Content="Rooms:" Grid.Column="2" Grid.Row="1"/>
-        <ListBox Grid.Column="2" Grid.Row="2" Grid.ColumnSpan="2" Margin="6" ItemsSource="{Binding Users}" >
-            <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                    <Label Content="{Binding}"/>
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-        </ListBox>
+        <DockPanel Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="4">
+            <StackPanel DockPanel.Dock="Left">
+                <Label Content="Rooms:" Grid.Column="2" Grid.Row="1"/>
+                <ListBox Margin="6" ItemsSource="{Binding Rooms}" Width="150" x:Name="RoomsList">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Label Content="{Binding Name}"/>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ListBox>
+            </StackPanel>
+            <StackPanel DockPanel.Dock="Left">
+                <Label Content="Users:" Grid.Column="2" Grid.Row="1"/>
+                <ListBox Margin="6" ItemsSource="{Binding ElementName=RoomsList, Path=SelectedItem.Users}" Width="100">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Label Content="{Binding}"/>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ListBox>
+            </StackPanel>
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <TextBlock  Margin="6" Background="LightGray" Padding="10" Text="{Binding ElementName=RoomsList, Path=SelectedItem.Chat}" />
+            </ScrollViewer>
+        </DockPanel>
     </Grid>
 </Controls:MetroWindow>

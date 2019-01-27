@@ -12,17 +12,15 @@ namespace Exercise.SignalR.Server
     public class MessageHub : Hub
     {
         // Connection ID and name
-        private static readonly Dictionary<string, string> Users = new Dictionary<string,string>();
+        private static readonly Dictionary<string, string> Users = new Dictionary<string, string>();
         // Room name - Connection ID's
         private static readonly Dictionary<string, HashSet<string>> Rooms = new Dictionary<string, HashSet<string>>();
 
-        public async Task<Dictionary<string,List<string>>> SignIn(string name)
+        public async Task<Dictionary<string, List<string>>> SignIn(string name)
         {
             Users[Context.ConnectionId] = name;
 
             App.Messager.Send<string>($"User {name} connected");
-
-            await JoinRoom("Main room");
 
             return Rooms.ToDictionary(a => a.Key, b => Users.Where(c => b.Value.Contains(c.Key)).Select(d => d.Value).ToList());
         }
@@ -35,6 +33,11 @@ namespace Exercise.SignalR.Server
         public async Task JoinRoom(string roomName)
         {
             await Groups.Add(Context.ConnectionId, roomName);
+
+            if (!Rooms.ContainsKey(roomName))
+            {
+                Rooms[roomName] = new HashSet<string>();
+            }
 
             Rooms[roomName].Add(Context.ConnectionId);
 
