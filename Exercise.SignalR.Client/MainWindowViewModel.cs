@@ -23,12 +23,11 @@ namespace Exercise.SignalR.Client
         private string _input;
         public string Input { get => _input; set => Set(ref _input, value); }
 
-
-        private ObservableCollection<string> _users;
-        public ObservableCollection<string> Users
+        private ObservableCollection<Room> _rooms;
+        public ObservableCollection<Room> Rooms
         {
-            get { return _users; }
-            set { Set(ref _users, value); }
+            get { return _rooms; }
+            set { Set(ref _rooms, value); }
         }
 
         public ICommand SignInCommand { get; set; }
@@ -54,10 +53,6 @@ namespace Exercise.SignalR.Client
         {
             SignOutCommand = new RelayCommand(() =>
             {
-                HubProxy.Invoke("SignOut", _name);
-
-                Users.Clear();
-
                 Connection.Stop();
 
                 Connection.Dispose();
@@ -82,11 +77,6 @@ namespace Exercise.SignalR.Client
                 HubProxy.On<string, string>("addMessage", (name, message) =>
                 {
                     LogWindow = $"{name}: {message}";
-                });
-
-                HubProxy.On<List<string>>("OnUserChanged", names =>
-                {
-                    Users = new ObservableCollection<string>(names);
                 });
 
                 try
