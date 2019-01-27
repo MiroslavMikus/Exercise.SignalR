@@ -13,6 +13,14 @@ namespace Exercise.SignalR.Client
         public string Name { get; set; }
         private StringBuilder _logWindow = new StringBuilder();
 
+        private bool _isActive;
+
+        public bool IsActive
+        {
+            get { return _isActive; }
+            set { Set(ref _isActive, value); }
+        }
+
         public string Chat
         {
             get
@@ -21,7 +29,7 @@ namespace Exercise.SignalR.Client
             }
             set
             {
-                _logWindow.Insert(0, $"{DateTime.Now.ToString("HH:mm:ss:FF")}: {value}{Environment.NewLine}");
+                _logWindow.Insert(0, $"[{DateTime.Now.ToString("HH:mm:ss")}] {value}{Environment.NewLine}");
                 RaisePropertyChanged();
             }
         }
