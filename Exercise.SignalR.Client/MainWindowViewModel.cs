@@ -18,6 +18,8 @@ namespace Exercise.SignalR.Client
     {
         public IHubProxy HubProxy { get; set; }
         const string SERVER_URI = "http://localhost:8080/signalr";
+        private readonly IDialogCoordinator _dialogCoordinator;
+
         public HubConnection Connection { get; set; }
 
         private string _name;
@@ -55,8 +57,10 @@ namespace Exercise.SignalR.Client
             }
         }
 
-        public MainWindowViewModel()
+        public MainWindowViewModel(IDialogCoordinator dialogCoordinator)
         {
+            _dialogCoordinator = dialogCoordinator;
+
             SignOutCommand = new RelayCommand(() =>
             {
                 foreach (var room in Rooms)
@@ -136,13 +140,13 @@ namespace Exercise.SignalR.Client
                     NegativeButtonText = "Cancel"
                 };
 
-                var input = await (App.Current.MainWindow as MetroWindow).ShowInputAsync("Create a new chatroom", "Enter room name:", mySettings);
+                var input = await _dialogCoordinator.ShowInputAsync(this, "Create a new chatroom", "Enter room name:", mySettings);
 
                 if (!string.IsNullOrEmpty(input))
                 {
                     if (Rooms.Any(a => a.Name == input))
                     {
-                        await (App.Current.MainWindow as MetroWindow).ShowMessageAsync("Error", $"Specified room: '{input}' already exist!");
+                        await _dialogCoordinator.ShowMessageAsync(this, "Error", $"Specified room: '{input}' already exist!");
                     }
                     else
                     {
