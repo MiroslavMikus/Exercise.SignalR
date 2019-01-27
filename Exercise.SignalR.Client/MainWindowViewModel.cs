@@ -23,7 +23,7 @@ namespace Exercise.SignalR.Client
         private string _input;
         public string Input { get => _input; set => Set(ref _input, value); }
 
-        private ObservableCollection<RoomViewModel> _rooms;
+        private ObservableCollection<RoomViewModel> _rooms = new ObservableCollection<RoomViewModel>();
         public ObservableCollection<RoomViewModel> Rooms
         {
             get { return _rooms; }
@@ -74,26 +74,22 @@ namespace Exercise.SignalR.Client
 
                 Input = string.Empty;
 
-                HubProxy.On<string, string, string>("addMessage", (name, room, message) =>
-                {
-                    if (!Rooms.Any(b => b.Name == room))
-                    {
-                        Rooms.Add(new RoomViewModel()
-                        {
-                            Name = room
-                        });
-
-                        Rooms.Single(b => b.Name == room).Chat = message;
-                    }
-                });
-
-                HubProxy.On<>
+                SetupProxy(HubProxy);
 
                 try
                 {
                     await Connection.Start();
 
-                    await HubProxy.Invoke("SignIn", _name);
+                    var rooms = await HubProxy.Invoke<Dictionary<string, List<string>>>("SignIn", _name);
+
+                    foreach (var room in rooms)
+                    {
+                        Rooms.Add(new RoomViewModel
+                        {
+                            Name = room.Key,
+                            Users = new ObservableCollection<string>(room.Value)
+                        });
+                    }
 
                     IsConnected = true;
                 }
@@ -109,6 +105,37 @@ namespace Exercise.SignalR.Client
                 HubProxy.Invoke("send", _name, Input);
                 Input = string.Empty;
             });
+        }
+
+        private void SetupProxy(IHubProxy proxy)
+        {
+            proxy.On("addMessage", (Action<string, string, string>)((name, room, message) =>
+            {
+                EnsureRoom(room).Chat = message;
+            }));
+
+            proxy.On<string, string>("userJoinRoom", (room, user) =>
+            {
+                EnsureRoom(room).Users.Add(user);
+            });
+
+            proxy.On<string, string>("userLeaveRoom", (room, user) =>
+            {
+                EnsureRoom(room).Users.Remove(user);
+            });
+        }
+
+        private RoomViewModel EnsureRoom(string room)
+        {
+            if (!Rooms.Any(b => b.Name == room))
+            {
+                Rooms.Add(new RoomViewModel()
+                {
+                    Name = room
+                });
+            }
+
+            return Rooms.Single(b => b.Name == room);
         }
 
         private void Connection_StateChanged(StateChange state)
