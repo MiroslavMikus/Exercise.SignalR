@@ -66,10 +66,11 @@ namespace Exercise.SignalR.Client
         {
             _dialogCoordinator = dialogCoordinator;
 
-            SignOutCommand = new RelayCommand(() =>
+            SignOutCommand = new RelayCommand(async () =>
             {
                 foreach (var room in Rooms)
                 {
+                    await _hubProxy.Invoke("leaveRoom", room.Name);
                     room.Users.Clear();
                 }
 
@@ -137,9 +138,9 @@ namespace Exercise.SignalR.Client
                 Input = string.Empty;
             });
 
-            LeaveCommand = new RelayCommand<RoomViewModel>(a =>
+            LeaveCommand = new RelayCommand<RoomViewModel>(async a =>
             {
-                _hubProxy.Invoke("leaveRoom", a.Name);
+                await _hubProxy.Invoke("leaveRoom", a.Name);
             });
 
             JoinCommand = new RelayCommand<string>(a =>
